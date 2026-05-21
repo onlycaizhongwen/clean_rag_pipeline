@@ -32,6 +32,7 @@
 
 ## 变更记录
 
+- 2026-05-21：修复对客演示控制台上传报错：当页面默认 `source_id=console-demo-source` 在 `data_source` 表中不存在时，上传写入 `document` 会触发 `document_data_source_id_fkey` 外键失败；已在上传服务写入文档前幂等初始化缺失的 `data_source`。同时修复 API Docker 构建稳定性：默认使用清华 PyPI 镜像并显式安装 `setuptools/wheel`，避免基础镜像缺少构建后端或外网包源哈希异常导致重建失败。验证：`python -m compileall services\api\app`、`docker compose -f infra\docker-compose.yml up -d --build api`、`console-demo-source` 文件上传、job 轮询至 `SUCCEEDED` 均通过。
 - 2026-05-18：新增 `docs/codex/v1/plans/data-cleaning-rag-phase7-production-readiness-plan.md`，规划 Phase 7 生产就绪工作，拆分为 P7-1 生产认证与授权、P7-2 正式 rerank 服务接入与容量基线、P7-3 客户真实语料评测包、P7-4 隔离恢复演练、P7-5 CI/CD 发布流水线、P7-6 测试/生产部署形态设计；建议下一步优先执行 P7-1。
 - 2026-05-18：新增 `docs/codex/v1/designs/data-cleaning-rag-phase7-auth-design.md` 和 `docs/codex/v1/plans/data-cleaning-rag-phase7-p7-1-auth-plan.md`，明确 local/gateway/iam 三种认证模式、可信 Header 字段契约、权限标签兜底策略、错误码和 P7-1 实施步骤；下一步进入 P7-1 代码实现。
 - 2026-05-18：完成 Phase 7 P7-1 生产认证与授权接入首版：新增 `AUTH_CONTEXT_MODE=local|gateway|iam`、`AUTH_REQUIRE_ACTOR`、`AUTH_REQUIRE_TENANT`、`AUTH_DEFAULT_PERMISSION_TAGS`、`AUTH_EMPTY_PERMISSION_POLICY` 等配置；gateway/iam 模式可强制校验可信 Header，local 模式保持 PoC 兼容；Compose、环境模板、API 契约、部署运维说明和问题排查手册已同步；新增 `docs/codex/v1/trace/data-cleaning-rag-phase7-auth-trace.md`，回归验证通过。下一步进入 P7-2 正式 rerank 服务接入与容量基线。

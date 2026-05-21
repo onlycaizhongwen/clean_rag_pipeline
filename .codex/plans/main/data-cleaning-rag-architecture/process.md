@@ -318,6 +318,8 @@
 
 ## 错误记录
 
+- 2026-05-21：对客演示控制台上传文件时报 `document_data_source_id_fkey` 外键失败，根因是前端默认 `source_id=console-demo-source` 未在 `data_source` 初始化数据中存在。修复：`services/api/app/services/ingestion_service.py` 在写入 `document` 前执行 `INSERT INTO data_source ... ON CONFLICT DO NOTHING`，保证演示/测试 source 首次使用时自动补齐。验证：API 容器重建后使用 `console-demo-source` 上传样例文件返回 job，Worker 处理成功，job 状态为 `SUCCEEDED`。
+- 2026-05-21：API Docker 镜像重建时 pip 下载 `setuptools` 出现哈希不一致，改用 `PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple` 并显式安装 `setuptools wheel` 后再 `pip install --no-build-isolation .`，镜像重建通过。
 - 2026-05-15：本机全局 Python 未安装项目依赖，直接导入 API/Worker 失败，缺少 `minio`、`pika`；应通过容器或独立虚拟环境验证。
 - 2026-05-15：Docker Desktop 守护进程未运行，`docker build` 无法连接 `docker_engine`，镜像构建验证需待 Docker 启动后重试。
 - 2026-05-16：Docker Desktop 已启动，但 Docker Hub 授权接口连接超时，`docker compose build api worker` 拉取 `python:3.12-slim` 失败；需要配置 Docker 镜像源或恢复网络后重试。

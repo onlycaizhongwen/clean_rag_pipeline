@@ -121,6 +121,14 @@ def _create_ingestion_records(
         with connection.cursor() as cursor:
             cursor.execute(
                 """
+                INSERT INTO data_source (id, tenant_id, name, type, status)
+                VALUES (%s, %s, %s, 'FILE', 'ENABLED')
+                ON CONFLICT (id) DO NOTHING
+                """,
+                (source_id, tenant_id, source_id),
+            )
+            cursor.execute(
+                """
                 INSERT INTO document (
                     id, tenant_id, knowledge_base_id, permission_tags, data_source_id, title, source_uri, content_type, status
                 )
