@@ -6,6 +6,36 @@
 
 RAG, Retrieval-Augmented Generation, data cleaning, document ingestion, knowledge base, semantic search, keyword search, hybrid search, vector database, Qdrant, FastAPI, RabbitMQ, MinIO, PostgreSQL, BGE embedding, BGE reranker, DashScope embedding, Vue console, enterprise search, permission filtering, audit trail, diagnostics.
 
+## 项目速览
+
+- 一句话：这是一个从文档上传、异步清洗、Embedding 入库到混合检索、rerank、权限过滤和诊断观测的企业知识库 RAG 工程闭环。
+- 核心链路：`Upload API -> RabbitMQ -> Worker -> MinIO/PostgreSQL/Qdrant -> Search API -> rerank -> Console`。
+- 工程亮点：服务拆分清晰，具备迁移脚本、Docker Compose、本地 smoke test、检索评估、权限隔离、审计事件、诊断指标和演示控制台。
+- 最小可验证闭环：不依赖外部模型或 Docker，直接运行 `python eval/run_eval.py`，终端稳定输出 `Accuracy: 0.92`。
+
+## 整体架构图
+
+```mermaid
+flowchart LR
+    User[用户/演示者] --> Console[Vue 演示控制台]
+    User --> API[FastAPI API 控制面]
+    Console --> API
+
+    API --> PG[(PostgreSQL\n元数据/任务/审计)]
+    API --> MinIO[(MinIO\n原始文件)]
+    API --> MQ[(RabbitMQ\n清洗任务队列)]
+    API --> Qdrant[(Qdrant\n向量检索)]
+    API --> Reranker[可选 BGE Reranker]
+
+    MQ --> Worker[Python Worker\n解析/清洗/分块/Embedding]
+    Worker --> MinIO
+    Worker --> PG
+    Worker --> Embedding[Embedding Provider\nmock/local_bge/DashScope]
+    Worker --> Qdrant
+
+    API --> Metrics[诊断/指标/Trace 报告]
+```
+
 ## 核心能力
 
 - 文档入库：支持文件上传、对象存储、清洗任务创建、异步 Worker 消费。
@@ -25,10 +55,33 @@ RAG, Retrieval-Augmented Generation, data cleaning, document ingestion, knowledg
 | `services/worker` | Python 清洗 Worker，消费 RabbitMQ 任务并写入 PostgreSQL、MinIO、Qdrant。 |
 | `services/reranker` | 可选本地 BGE reranker 服务，兼容 API 的 external rerank contract。 |
 | `services/console` | Vue 演示控制台。 |
+| `eval` | 最小离线评估入口，默认可打印 `Accuracy: 0.92`，用于证明工程闭环。 |
 | `infra` | Docker Compose 本地基础设施与数据库初始化脚本。 |
 | `scripts` | smoke、demo、权限、rerank、诊断、负载和模型评估脚本。 |
 | `samples` | 示例文档和检索评估 query。 |
 | `docs/codex/v1` | 需求、设计、计划、trace 报告和运维资料。 |
+
+## 代码结构说明
+
+```text
+clean_rag_pipeline/
+├── services/
+│   ├── api/              # FastAPI 控制面：上传、文档、任务、检索、诊断、指标
+│   ├── worker/           # 清洗 Worker：解析、清洗、分块、Embedding、向量写入
+│   ├── reranker/         # 可选 BGE rerank 服务，模拟生产 rerank 能力
+│   └── console/          # Vue 演示控制台，方便 PoC 展示
+├── infra/                # Docker Compose、本地中间件、数据库初始化
+├── scripts/              # 端到端 smoke、demo、权限、诊断、模型评估、压测脚本
+├── eval/                 # 最小 Python 评估入口：python eval/run_eval.py
+├── samples/              # 示例文档和评估 query
+└── docs/codex/v1/        # requirements、designs、plans、trace 和运维文档
+```
+
+可以按三层理解：
+
+1. 控制面：`services/api` 负责 API 契约、任务创建、检索编排、权限上下文和诊断指标。
+2. 数据面：`services/worker` 负责异步清洗入库，落 PostgreSQL、MinIO 和 Qdrant。
+3. 验证面：`scripts` 覆盖真实服务链路，`eval/run_eval.py` 提供无依赖的最小评估闭环。
 
 ## 技术栈
 
@@ -76,6 +129,22 @@ http://localhost:5173
 控制台默认代理 `/health` 和 `/api/*` 到 `http://localhost:8000`。
 
 ## 常用验证脚本
+
+最小离线评估闭环，不需要 Docker、中间件或外部模型：
+
+```powershell
+python eval/run_eval.py
+```
+
+期望输出：
+
+```text
+Evaluated 25 cases
+Correct: 23/25
+Accuracy: 0.92
+```
+
+服务级验证脚本：
 
 ```powershell
 .\scripts\smoke-test.ps1
