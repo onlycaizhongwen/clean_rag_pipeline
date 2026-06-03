@@ -13,6 +13,40 @@ RAG, Retrieval-Augmented Generation, data cleaning, document ingestion, knowledg
 - 工程亮点：服务拆分清晰，具备迁移脚本、Docker Compose、本地 smoke test、检索评估、权限隔离、审计事件、诊断指标和演示控制台。
 - 最小可验证闭环：不依赖外部模型或 Docker，直接运行 `python eval/run_eval.py`，终端稳定输出 `Accuracy: 0.92`。
 
+## 快速链接
+
+- [快速启动](#快速启动)
+- [API 入口](#api-入口)
+- [文档索引](#文档索引)
+- [演示控制台说明](services/console/README.md)
+- [本地基础设施说明](infra/README.md)
+- [API 契约](docs/codex/v1/plans/data-cleaning-rag-api-contract.md)
+- [架构设计](docs/codex/v1/designs/data-cleaning-rag-architecture-design.md)
+- [部署运维](docs/codex/v1/plans/数据清洗与RAG服务部署运维说明.md)
+- [问题排查](docs/codex/v1/plans/数据清洗与RAG服务问题排查手册.md)
+
+## 图片预览
+
+### 总体架构
+
+![总体架构图](docs/codex/v1/assets/总体架构图.png)
+
+### MVP 总体架构
+
+![MVP总体架构图](docs/codex/v1/assets/MVP总体架构图.png)
+
+### 文档入库流程
+
+![MVP文档入库流程图](docs/codex/v1/assets/MVP文档入库流程图.png)
+
+### 检索时序
+
+![MVP检索时序图](docs/codex/v1/assets/MVP检索时序图.png)
+
+### 调试控制台
+
+![调试控制台图](docs/codex/v1/assets/调式控制台图.png)
+
 ## 整体架构图
 
 ```mermaid
@@ -185,13 +219,13 @@ Accuracy: 0.92
 
 ## 文档索引
 
-- API 契约：`docs/codex/v1/plans/data-cleaning-rag-api-contract.md`
-- 架构设计：`docs/codex/v1/designs/data-cleaning-rag-architecture-design.md`
-- 部署运维：`docs/codex/v1/plans/数据清洗与RAG服务部署运维说明.md`
-- 问题排查：`docs/codex/v1/plans/数据清洗与RAG服务问题排查手册.md`
-- 发布检查：`docs/codex/v1/plans/数据清洗与RAG服务发布检查清单.md`
-- 演示控制台：`services/console/README.md`
-- 本地基础设施：`infra/README.md`
+- API 契约：[docs/codex/v1/plans/data-cleaning-rag-api-contract.md](docs/codex/v1/plans/data-cleaning-rag-api-contract.md)
+- 架构设计：[docs/codex/v1/designs/data-cleaning-rag-architecture-design.md](docs/codex/v1/designs/data-cleaning-rag-architecture-design.md)
+- 部署运维：[docs/codex/v1/plans/数据清洗与RAG服务部署运维说明.md](docs/codex/v1/plans/数据清洗与RAG服务部署运维说明.md)
+- 问题排查：[docs/codex/v1/plans/数据清洗与RAG服务问题排查手册.md](docs/codex/v1/plans/数据清洗与RAG服务问题排查手册.md)
+- 发布检查：[docs/codex/v1/plans/数据清洗与RAG服务发布检查清单.md](docs/codex/v1/plans/数据清洗与RAG服务发布检查清单.md)
+- 演示控制台：[services/console/README.md](services/console/README.md)
+- 本地基础设施：[infra/README.md](infra/README.md)
 
 ## 当前定位
 
